@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "dungtl2003/snowflake-uuid/proto";
+
+service IdGenerator {
+  rpc GenerateId(GenerateIdRequest) returns (GenerateIdResponse) {}
+}
+
+message GenerateIdRequest {}
+
+message GenerateIdResponse { string id = 1; }
