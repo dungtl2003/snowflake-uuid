@@ -1,9 +1,10 @@
-package internal
+package worker
 
 import (
+	"errors"
 	"fmt"
-	"log"
 	"math/big"
+	"sync"
 	"time"
 )
 
@@ -18,11 +19,13 @@ type Worker struct {
 	datacenterIdLeftShift *big.Int
 	workerIdLeftShift     *big.Int
 	lastTimestamp         *big.Int
+
+	mu sync.Mutex
 }
 
-func New(datacenterId *big.Int, workerId *big.Int, epoch *big.Int, datacenterIdBits *big.Int, workerIdBits *big.Int, sequenceBits *big.Int) *Worker {
+func New(datacenterId *big.Int, workerId *big.Int, epoch *big.Int, datacenterIdBits *big.Int, workerIdBits *big.Int, sequenceBits *big.Int) (*Worker, error) {
 	if datacenterId == nil || workerId == nil {
-		log.Fatalf("data center ID and worker ID cannot be nil")
+		return nil, errors.New("data center ID and worker ID cannot be nil")
 	}
 
 	w := new(Worker)
@@ -41,33 +44,27 @@ func New(datacenterId *big.Int, workerId *big.Int, epoch *big.Int, datacenterIdB
 	}
 
 	if epoch.Cmp(big.NewInt(0)) == -1 {
-		log.Fatalf("epoch time cannot be smaller than 0")
+		return nil, errors.New("epoch time cannot be smaller than 0")
 	}
 
 	if sequenceBits.Cmp(big.NewInt(0)) == -1 {
-		log.Fatalf("sequence bits cannot be smaller than 0")
+		return nil, errors.New("sequence bits cannot be smaller than 0")
 	}
 
 	workerIdMaxBits := big.NewInt(0).Xor(big.NewInt(-1), big.NewInt(0).Lsh(big.NewInt(-1), uint(workerIdBits.Uint64())))
 	if workerId.Cmp(big.NewInt(0)) == -1 || workerId.Cmp(workerIdMaxBits) == 1 {
-		log.Fatalf("worker ID cannot be greater than %s or smaller than 0", workerIdMaxBits.String())
+		return nil, fmt.Errorf("worker ID cannot be greater than %s or smaller than 0", workerIdMaxBits.String())
 	}
 
 	datacenterIdMaxBits := big.NewInt(0).Xor(big.NewInt(-1), big.NewInt(0).Lsh(big.NewInt(-1), uint(datacenterIdBits.Uint64())))
 	if datacenterId.Cmp(big.NewInt(0)) == -1 || datacenterId.Cmp(datacenterIdMaxBits) == 1 {
-		log.Fatalf("datacenter ID cannot be greater than %s or smaller than 0", datacenterIdMaxBits.String())
+		return nil, fmt.Errorf("datacenter ID cannot be greater than %s or smaller than 0", datacenterIdMaxBits.String())
 	}
 
 	sequenceMask := big.NewInt(0).Xor(big.NewInt(-1), big.NewInt(0).Lsh(big.NewInt(-1), uint(sequenceBits.Uint64())))
 	workerIdLeftShift := sequenceBits
 	datacenterIdLeftShift := big.NewInt(0).Add(workerIdBits, sequenceBits)
 	timestampLeftShift := big.NewInt(0).Add(datacenterIdBits, big.NewInt(0).Add(workerIdBits, sequenceBits))
-
-	log.Printf("worker configuration:")
-	log.Printf("epoch time in milliseconds: %s", epoch.String())
-	log.Printf("sequence bits: %s", sequenceBits.String())
-	log.Printf("worker ID bits: %s", workerIdMaxBits.String())
-	log.Printf("datacenter ID bits: %s", datacenterIdMaxBits.String())
 
 	w.epoch = epoch
 	w.datacenterId = datacenterId
@@ -79,10 +76,13 @@ func New(datacenterId *big.Int, workerId *big.Int, epoch *big.Int, datacenterIdB
 	w.timestampLeftShift = timestampLeftShift
 	w.lastTimestamp = big.NewInt(-1)
 
-	return w
+	return w, nil
 }
 
 func (w *Worker) NextId() (*big.Int, error) {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+
 	var sequenceId *big.Int
 	currTimestamp := w.now()
 
