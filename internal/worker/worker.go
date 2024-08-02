@@ -31,7 +31,7 @@ func New(datacenterId *big.Int, workerId *big.Int, epoch *big.Int, datacenterIdB
 	w := new(Worker)
 
 	if epoch == nil {
-		epoch = big.NewInt(1609459200000)
+		epoch = big.NewInt(1704067200)
 	}
 	if sequenceBits == nil {
 		sequenceBits = big.NewInt(12)

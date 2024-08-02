@@ -2,7 +2,6 @@ package tools
 
 import (
 	"errors"
-	"fmt"
 	"math/big"
 	"os"
 	"strconv"
@@ -72,22 +71,6 @@ func getSequenceBits() (*big.Int, error) {
 	}
 
 	return convertToBigint(raw)
-}
-
-func getEnvironment() (string, error) {
-	environment := os.Getenv("ENV")
-	if environment == "" {
-		return "dev", nil
-	}
-
-	switch environment {
-	case "dev":
-		fallthrough
-	case "prod":
-		return environment, nil
-	default:
-		return "", fmt.Errorf("unsupported environment: %v", environment)
-	}
 }
 
 func getWorkerIdBits() (*big.Int, error) {

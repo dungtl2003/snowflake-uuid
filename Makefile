@@ -13,14 +13,16 @@ test:
 benchmark:
 	go test -bench=. ./...
 
+clean:
+	rm internal/pb/*
+
+build-dev: clean gen cert-dev test benchmark
+
 server:
 	go run ./cmd/main.go -port=9000
 
 server-tls:
 	go run ./cmd/main.go -port=9000 -tls
 
-clean:
-	rm internal/pb/*
-
 .PHONY:
-	gen cert-dev cert-prod test benchmark server clean
+	gen cert-dev cert-prod test benchmark server server-tls clean build-dev
