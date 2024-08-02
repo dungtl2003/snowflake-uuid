@@ -2,6 +2,7 @@ package tools
 
 import (
 	"errors"
+	"fmt"
 	"math/big"
 	"os"
 	"strconv"
@@ -10,7 +11,6 @@ import (
 )
 
 type Configuration struct {
-	Port             int
 	DatacenterId     *big.Int
 	WorkerId         *big.Int
 	Epoch            *big.Int
@@ -19,25 +19,8 @@ type Configuration struct {
 	SequenceBits     *big.Int
 }
 
-func (config *Configuration) Load(environment string) error {
-	var filePath string
-	switch environment {
-	case "development":
-		filePath = "environments/dev/.env"
-		break
-	case "production":
-		filePath = "environments/prod/.env"
-		break
-	default:
-		return errors.New("unsupported environment")
-	}
-
-	err := godotenv.Load(filePath)
-	if err != nil {
-		return err
-	}
-
-	port, err := getPort()
+func (config *Configuration) Load() error {
+	err := godotenv.Load()
 	if err != nil {
 		return err
 	}
@@ -72,7 +55,6 @@ func (config *Configuration) Load(environment string) error {
 		return err
 	}
 
-	config.Port = port
 	config.DatacenterId = datacenterId
 	config.WorkerId = workerId
 	config.Epoch = epoch
@@ -90,6 +72,22 @@ func getSequenceBits() (*big.Int, error) {
 	}
 
 	return convertToBigint(raw)
+}
+
+func getEnvironment() (string, error) {
+	environment := os.Getenv("ENV")
+	if environment == "" {
+		return "dev", nil
+	}
+
+	switch environment {
+	case "dev":
+		fallthrough
+	case "prod":
+		return environment, nil
+	default:
+		return "", fmt.Errorf("unsupported environment: %v", environment)
+	}
 }
 
 func getWorkerIdBits() (*big.Int, error) {
@@ -135,15 +133,6 @@ func getDatacenterId() (*big.Int, error) {
 	}
 
 	return convertToBigint(raw)
-}
-
-func getPort() (int, error) {
-	raw := os.Getenv("PORT")
-	if raw == "" {
-		return 9000, nil
-	}
-
-	return strconv.Atoi(raw)
 }
 
 func convertToBigint(str string) (*big.Int, error) {

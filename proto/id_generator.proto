@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package proto;
 
-option go_package = "dungtl2003/snowflake-uuid/proto";
+option go_package = ".;pb";
 
 service IdGenerator {
   rpc GenerateId(GenerateIdRequest) returns (GenerateIdResponse) {}

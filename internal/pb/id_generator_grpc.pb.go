@@ -2,9 +2,9 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v5.27.2
-// source: proto/id_generator.proto
+// source: id_generator.proto
 
-package proto
+package pb
 
 import (
 	context "context"
@@ -117,5 +117,5 @@ var IdGenerator_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "proto/id_generator.proto",
+	Metadata: "id_generator.proto",
 }
