@@ -25,8 +25,6 @@ variables [here](#-list-of-available-environment-variables):<br>
 ## ⇁ List of available environment variables
 
 # Environment variables
-DATACENTER_ID=0
-WORKER_ID=1
 
 | Variable | Required | Purpose | Default |
 | -------- | -------- | ------- | ------- |
