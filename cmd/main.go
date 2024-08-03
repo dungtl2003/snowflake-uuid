@@ -87,7 +87,7 @@ func main() {
 	}
 
 	log.Println("Creating ID generator server")
-	idGeneratorServer, err := server.New(config.DatacenterId, config.WorkerId, config.Epoch, config.DatacenterIdBits, config.WorkerIdBits, config.SequenceBits)
+	idGeneratorServer, err := server.New(config.WorkerId, config.Epoch)
 	if err != nil {
 		log.Fatalf("Failed to create ID generator server: %v", err)
 	}

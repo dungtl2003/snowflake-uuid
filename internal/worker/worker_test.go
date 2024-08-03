@@ -2,25 +2,24 @@ package worker_test
 
 import (
 	"dungtl2003/snowflake-uuid/internal/worker"
-	"math/big"
 	"testing"
 )
 
 func TestCreateWorker(t *testing.T) {
-	_, err := worker.New(big.NewInt(0), big.NewInt(1), nil, nil, nil, nil)
+	_, err := worker.New(1, 1722613500)
 	if err != nil {
 		t.Fatalf("failed to create worker: %v", err)
 	}
 
-	_, err = worker.New(big.NewInt(12), big.NewInt(4), big.NewInt(1622502784), big.NewInt(10), big.NewInt(12), big.NewInt(20))
+	_, err = worker.New(300, 1532213569)
 	if err != nil {
 		t.Fatalf("failed to create worker: %v", err)
 	}
 }
 
 func TestGenerateUniqueId(t *testing.T) {
-	w, _ := worker.New(big.NewInt(0), big.NewInt(1), nil, nil, nil, nil)
-	idsSet := make(map[*big.Int]int)
+	w, _ := worker.New(1, 1722613500)
+	idsSet := make(map[int64]int)
 
 	for i := 0; i < 1000000; i++ {
 		id, err := w.NextId()
@@ -29,7 +28,7 @@ func TestGenerateUniqueId(t *testing.T) {
 		}
 
 		if _, ok := idsSet[id]; ok {
-			t.Fatalf("error: generated duplicated ID")
+			t.Fatalf("error: generated duplicated ID %d", id)
 		}
 
 		idsSet[id] = 1
@@ -37,9 +36,9 @@ func TestGenerateUniqueId(t *testing.T) {
 }
 
 func TestSequentialExecution(t *testing.T) {
-	w, _ := worker.New(big.NewInt(0), big.NewInt(1), nil, nil, nil, nil)
-	idsSet := make(map[*big.Int]int)
-	c := make(chan *big.Int)
+	w, _ := worker.New(1, 1722613500)
+	idsSet := make(map[int64]int)
+	c := make(chan int64)
 	errors := make(chan error)
 
 	go func() {
@@ -60,7 +59,7 @@ func TestSequentialExecution(t *testing.T) {
 
 	for id := range c {
 		if _, ok := idsSet[id]; ok {
-			t.Fatalf("error: generated duplicated ID")
+			t.Fatalf("error: generated duplicated ID %d", id)
 		}
 
 		idsSet[id] = 1
@@ -73,11 +72,11 @@ func TestSequentialExecution(t *testing.T) {
 
 // check if there is any problems of creating multiple workers when a worker is generating IDs
 func TestRace(t *testing.T) {
-	w, _ := worker.New(big.NewInt(0), big.NewInt(1), nil, nil, nil, nil)
+	w, _ := worker.New(1, 1722613500)
 
 	go func() {
 		for i := 0; i < 10000000; i++ {
-			worker.New(big.NewInt(0), big.NewInt(1), nil, nil, nil, nil)
+			worker.New(1, 1722613500)
 		}
 	}()
 
@@ -89,7 +88,7 @@ func TestRace(t *testing.T) {
 // BENCHMARK
 
 func BenchmarkNextId(b *testing.B) {
-	w, _ := worker.New(big.NewInt(0), big.NewInt(1), nil, nil, nil, nil)
+	w, _ := worker.New(1, 1722613500)
 
 	b.ReportAllocs()
 

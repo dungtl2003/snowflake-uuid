@@ -6,7 +6,6 @@ import (
 	"crypto/x509"
 	"fmt"
 	"log"
-	"math/big"
 	"net"
 	"os"
 	"testing"
@@ -37,7 +36,7 @@ var lis *bufconn.Listener
 func init() {
 	lis = bufconn.Listen(bufSize)
 
-	idGeneratorServer, err := server.New(big.NewInt(0), big.NewInt(1), nil, nil, nil, nil)
+	idGeneratorServer, err := server.New(1, 1722613500)
 	if err != nil {
 		log.Fatalf("Failed to create ID generator server: %v", err)
 	}

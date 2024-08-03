@@ -6,18 +6,29 @@ attributes = req_attributes
 
 [ req_attributes ]
 
-[ test_ca ]
+[ ca ]
 basicConstraints = critical,CA:TRUE
 subjectKeyIdentifier = hash
 authorityKeyIdentifier = keyid:always,issuer:always
 keyUsage = critical,keyCertSign
 
-[ test_server ]
+[ server ]
 basicConstraints = critical,CA:FALSE
 subjectKeyIdentifier = hash
 keyUsage = critical,digitalSignature,keyEncipherment,keyAgreement
 subjectAltName = @server_alt_names
 
 [ server_alt_names ]
+DNS.1 = chatapp.com
+DNS.2 = *.chatapp.com
+
+[ client ]
+basicConstraints = critical,CA:FALSE
+subjectKeyIdentifier = hash
+keyUsage = critical,nonRepudiation,digitalSignature,keyEncipherment
+extendedKeyUsage = critical,clientAuth
+subjectAltName = @client_alt_names
+
+[ client_alt_names ]
 DNS.1 = chatapp.com
 DNS.2 = *.chatapp.com

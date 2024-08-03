@@ -10,4 +10,4 @@ service IdGenerator {
 
 message GenerateIdRequest {}
 
-message GenerateIdResponse { string id = 1; }
+message GenerateIdResponse { int64 id = 1; }
