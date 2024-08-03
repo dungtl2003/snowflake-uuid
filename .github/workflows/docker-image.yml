@@ -9,8 +9,11 @@ on:
 jobs:
 
   create-envfile:
+
     runs-on: ubuntu-22.04
+
     steps:
+
     - name: Make envfile
       uses: SpicyPizza/create-envfile@v2.0
       with:
@@ -20,12 +23,24 @@ jobs:
         file_name: .env
 
   build:
+
     runs-on: ubuntu-22.04
+
     steps:
-    - uses: actions/checkout@v4
-    - name: Install Protoc
-      uses: arduino/setup-protoc@v3
+
+    - name: Checkout branch
+      uses: actions/checkout@v4
+
+    - name: Setup Go environment
+      uses: actions/setup-go@v5
       with:
-        version: "23.2"
+        go-version: '1.22.5' # The Go version to download (if necessary) and use.
+
+    - name: Installing protoc-gen-go
+      run: |
+        go install github.com/golang/protobuf/protoc-gen-go@v1.34.2
+        go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.5.1
+        export PATH="$PATH:$(go env GOPATH)/bin"
+
     - name: Build the Docker image
       run: make build_prod
