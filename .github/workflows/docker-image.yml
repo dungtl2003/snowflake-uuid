@@ -47,5 +47,26 @@ jobs:
         go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.5.1
 
     - name: Build the Docker image
+      run: make build_prod
+
+    - name: Run container
+      run: docker run -d --name container-test ilikeblue/snowflake-uuid:prod-$(git log --format="%h" -n 1)
+
+    - name: Wait for container to start
+      run: sleep 5
+      
+    - name: Check container status
+      run: docker ps --filter "name=container-test" --filter "status=running" --format "{{.Names}}"
+      id: check_status
+
+    - name: Verify container started
       run: |
-        make build_prod
+        if [ "${{ steps.check_status.outputs.stdout }}" != "container-test" ]; then
+          echo "Container did not start successfully"
+          exit 1
+        else
+          echo "Container is running"
+        fi
+
+    - name: Cleanup
+      run: docker rm -f container-test
