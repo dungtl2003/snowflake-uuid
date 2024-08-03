@@ -1,0 +1,66 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main", "dev" ]
+  pull_request:
+    branches: [ "main", "dev" ]
+  
+jobs:
+
+  build:
+
+    runs-on: ubuntu-22.04
+
+    steps:
+
+    - name: Checkout branch
+      uses: actions/checkout@v4
+
+    - name: Make envfile
+      uses: SpicyPizza/create-envfile@v2.0
+      with:
+        envkey_DEBUG: false
+        envkey_DATACENTER_ID: 1
+        envkey_WORKER_ID: 0
+        file_name: .env
+
+    - name: Setup Go environment
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.22.5' # The Go version to download (if necessary) and use.
+
+    - name: Installing protoc-compiler
+      run: |
+        sudo apt update
+        sudo apt install -y protobuf-compiler
+
+    - name: Installing protoc-gen-go
+      run: |
+        go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.34.2
+        go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.5.1
+
+    - name: Build the Docker image
+      run: make build_prod CERT_CONFIG_ENV=prod
+
+    - name: Run container
+      run: docker run -d --name container-test ilikeblue/snowflake-uuid:prod-$(git log --format="%h" -n 1)
+
+    - name: Wait for container to start
+      run: sleep 5
+      
+    - name: Check container status
+      run: echo "running=$(docker ps --filter "name=container-test" --filter "status=running" --format "{{.Names}}")" >> $GITHUB_OUTPUT
+      id: check_status
+
+    - name: Verify container started
+      run: |
+        if [ "${{ steps.check_status.outputs.running }}" != "container-test" ]; then
+          echo "Container did not start successfully"
+          exit 1
+        else
+          echo "Container is running"
+        fi
+
+    - name: Cleanup
+      run: docker rm -f container-test
