@@ -3,7 +3,7 @@
 ENVIRONMENT="dev";
 
 gen() {
-    rm *.pem
+    rm -f *.pem
     # Create the CA certificate
     openssl req -x509 \
       -newkey rsa:4096 \

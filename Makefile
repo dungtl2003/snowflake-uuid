@@ -11,8 +11,8 @@ _BUILD_ARGS_DOCKERFILE ?= Dockerfile
 
 clean:
 	$(info ==================== removing old proto and pem files ====================)
-	rm internal/pb/*
-	rm internal/data/x509/*.pem
+	rm -f internal/pb/*
+	rm -f internal/data/x509/*.pem
 
 gen:
 	$(info ==================== generating new proto files ====================)
