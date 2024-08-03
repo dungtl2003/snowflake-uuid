@@ -38,8 +38,8 @@ jobs:
 
     - name: Installing protoc-compiler
       run: |
-        apt update
-        apt install -y protobuf-compiler
+        sudo apt update
+        sudo apt install -y protobuf-compiler
 
     - name: Installing protoc-gen-go
       run: |
