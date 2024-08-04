@@ -13,7 +13,7 @@ this is a chat app's service that supports generating twitter's snowflake IDs
 
 ## ⇁ Prerequisites
 
-you must have go installed<br>
+you must have go and docker installed<br>
 
 ## ⇁ Setup
 
@@ -52,7 +52,7 @@ there are 2 ways to run the server:
 
 when using this, you don't have to do anything else. Just run:
 ```shell
-make server
+make run
 ```
 
 #### ⇁ TLS handshake
@@ -60,10 +60,10 @@ make server
 this project is using mutual TLS method, that means both client and server need to provide certificates to each other. First, you need to generate certificates for both client and server by using `make cert` (you don't need to do this if you have already ran `make build`). Next, copy `client_cert.pem`, `client_key.pem`, `ca_cert.pem` and `ca_key.pem` to your client application. Then you need to include these credentials when connecting to the server. You can change certificate configuration by adding `CERT_CONFIG_ENV={env}` to your `make cert` command (`make cert CERT_CONFIG_ENV=prod` for example)or run `make build_prod`<br>
 to run server in TLS mode, use this command:
 ```shell
-make server-tls
+make run_tls
 ```
-note that you need to make sure CA certificate of both client and server are the same
-
+note that you need to make sure CA certificate of both client and server are the same<br>
+you can run with docker using `make server` or `make server_tls`
 
 ## ⇁ Run tests
 

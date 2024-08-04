@@ -1,4 +1,4 @@
-FROM golang:1.22.5@sha256:86a3c48a61915a8c62c0e1d7594730399caa3feb73655dfe96c7bc17710e96cf
+FROM golang:1.22.5-alpine3.20@sha256:0d3653dd6f35159ec6e3d10263a42372f6f194c3dea0b35235d72aabde86486e
 
 WORKDIR /usr/src/app
 
@@ -9,4 +9,4 @@ RUN go mod download && go mod verify
 COPY . .
 RUN go build -v -o /usr/local/bin/app ./cmd/main.go
 
-CMD ["app", "-port=9000"]
+ENTRYPOINT ["app", "-port=9000"]

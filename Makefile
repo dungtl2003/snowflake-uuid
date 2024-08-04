@@ -10,7 +10,7 @@ _BUILD_ARGS_RELEASE_TAG ?= latest
 _BUILD_ARGS_DOCKERFILE ?= Dockerfile
 
 clean:
-	$(info ==================== removing old proto and pem files ====================)
+	$(info ==================== cleaning project ====================)
 	rm -f internal/pb/*
 	rm -f internal/data/x509/*.pem
 
@@ -42,11 +42,33 @@ _releaser:
 	docker tag  ${DOCKER_USERNAME}/${APPLICATION_NAME}:${_BUILD_ARGS_TAG} ${DOCKER_USERNAME}/${APPLICATION_NAME}:${_BUILD_ARGS_RELEASE_TAG}
 	docker push ${DOCKER_USERNAME}/${APPLICATION_NAME}:${_BUILD_ARGS_RELEASE_TAG}
 
-server:
-	go run ./cmd/main.go -port=${SERVER_PORT}
+_server:
+	docker container run --rm --env-file .env ${DOCKER_USERNAME}/${APPLICATION_NAME}:${_BUILD_ARGS_TAG} -port=${SERVER_PORT}
 
-server-tls:
-	go run ./cmd/main.go -port=${SERVER_PORT} -tls
+_server_tls:
+	docker container run --rm --env-file .env ${DOCKER_USERNAME}/${APPLICATION_NAME}:${_BUILD_ARGS_TAG} -port=${SERVER_PORT} -tls
+
+run:
+	./scripts/load_env.sh go run ./cmd/main.go -port=${SERVER_PORT}
+
+run_tls:
+	./scripts/load_env.sh go run ./cmd/main.go -port=${SERVER_PORT} -tls
+
+server:
+	$(MAKE) _server
+
+server_tls:
+	$(MAKE) _server_tls
+
+server_%: 
+	$(MAKE) _server \
+		-e _BUILD_ARGS_TAG="$*-${GIT_HASH}" \
+		-e _BUILD_ARGS_DOCKERFILE="Dockerfile.$*"
+
+server_tls_%: 
+	$(MAKE) _server_tls \
+		-e _BUILD_ARGS_TAG="$*-${GIT_HASH}" \
+		-e _BUILD_ARGS_DOCKERFILE="Dockerfile.$*"
 
 build:
 	$(MAKE) _builder
@@ -72,5 +94,5 @@ release_%:
 		-e _BUILD_ARGS_RELEASE_TAG="$*-latest"
 
 .PHONY:
-	clean gen cert test benchmark server server-tls \
-	build push release build_% push_% release_%
+	clean gen cert test benchmark server server_tls server_% server_tls_% \
+	build run run_tls push release build_% push_% release_%
