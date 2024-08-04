@@ -4,8 +4,6 @@ import (
 	"errors"
 	"os"
 	"strconv"
-
-	"github.com/joho/godotenv"
 )
 
 type Configuration struct {
@@ -14,11 +12,6 @@ type Configuration struct {
 }
 
 func (config *Configuration) Load() error {
-	err := godotenv.Load()
-	if err != nil {
-		return err
-	}
-
 	workerId, err := getWorkerId()
 	if err != nil {
 		return err

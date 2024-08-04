@@ -44,7 +44,7 @@ jobs:
       run: make build_prod CERT_CONFIG_ENV=prod
 
     - name: Run container
-      run: docker run -d --name container-test ilikeblue/snowflake-uuid:prod-$(git log --format="%h" -n 1)
+      run: docker run --env-file .env -d --name container-test ilikeblue/snowflake-uuid:prod-$(git log --format="%h" -n 1)
 
     - name: Wait for container to start
       run: sleep 5
