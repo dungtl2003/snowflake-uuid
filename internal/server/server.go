@@ -21,7 +21,7 @@ func (s *IdGeneratorServer) GenerateId(ctx context.Context, in *pb.GenerateIdReq
 	return &pb.GenerateIdResponse{Id: id}, nil
 }
 
-func New(workerId int64, epoch int64) (*IdGeneratorServer, error) {
+func NewIdGeneratorServer(workerId int64, epoch int64) (*IdGeneratorServer, error) {
 	w, err := worker.New(workerId, epoch)
 
 	if err != nil {

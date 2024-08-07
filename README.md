@@ -57,7 +57,7 @@ make run
 
 #### ⇁ TLS handshake
 
-this project is using mutual TLS method, that means both client and server need to provide certificates to each other. First, you need to generate certificates for both client and server by using `make cert` (you don't need to do this if you have already ran `make build`). Next, copy `client_cert.pem`, `client_key.pem`, `ca_cert.pem` and `ca_key.pem` to your client application. Then you need to include these credentials when connecting to the server. You can change certificate configuration by adding `CERT_CONFIG_ENV={env}` to your `make cert` command (`make cert CERT_CONFIG_ENV=prod` for example)or run `make build_prod`<br>
+this project is using mutual TLS method, that means both client and server need to provide certificates to each other. First, you need to generate certificates for both client and server by using `make cert` (you don't need to do this if you have already ran `make build`). Next, copy `client_cert.pem`, `client_key.pem`, `ca_cert.pem` and `ca_key.pem` to your client application. Then you need to include these credentials when connecting to the server<br>
 to run server in TLS mode, use this command:
 ```shell
 make run_tls

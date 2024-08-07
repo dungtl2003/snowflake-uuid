@@ -20,16 +20,14 @@ var lis *bufconn.Listener
 
 func init() {
 	lis = bufconn.Listen(bufSize)
-	s := grpc.NewServer()
 
-	idGeneratorServer, err := server.New(1, 1722613500)
+	idGeneratorServer, err := server.NewIdGeneratorServer(1, 1722613500)
 	if err != nil {
 		log.Fatalf("Failed to create ID generator server: %v", err)
 	}
 
-	pb.RegisterIdGeneratorServer(s, idGeneratorServer)
 	go func() {
-		if err := s.Serve(lis); err != nil {
+		if err := server.RunGrpcServer(idGeneratorServer, false, lis); err != nil {
 			log.Fatalf("Server exited with error: %v", err)
 		}
 	}()
