@@ -2,7 +2,6 @@ DOCKER_USERNAME ?= ilikeblue
 DOCKER_FOLDER ?= ./docker
 APPLICATION_NAME ?= snowflake-uuid
 GIT_HASH ?= $(shell git log --format="%h" -n 1) 
-CERT_CONFIG_ENV ?= dev
 SERVER_PORT ?= 9000
 
 _BUILD_ARGS_TAG ?= ${GIT_HASH}
@@ -20,7 +19,7 @@ gen:
 
 cert:
 	$(info ==================== generating new pem files ====================)
-	cd internal/data/x509; ./cert_gen.sh --env ${CERT_CONFIG_ENV}; cd ../../..
+	cd internal/data/x509; ./cert_gen.sh; cd ../../..
 
 test:
 	$(info ==================== running tests ====================)

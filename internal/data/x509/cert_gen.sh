@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ENVIRONMENT="dev";
+CONFIG_FILE="./openssl.cnf"
 
 gen() {
     rm -f *.pem
@@ -73,27 +73,6 @@ gen() {
 }
 
 main() {
-    # Parse arguments
-    while [ $# -gt 0 ]; do
-      case $1 in
-        --env) 
-            shift
-            if test $# -gt 0; then
-                if [[ "$1" = "dev" || "$1" = "prod" ]]; then
-                    ENVIRONMENT=$1
-                else
-                    echo "environment can only be 'dev' or 'prod'"
-                    exit 1
-                fi
-            else
-                echo "no environment specified"
-                exit 1
-            fi
-      esac
-      shift
-    done
-
-    CONFIG_FILE="./openssl.cnf.$ENVIRONMENT"
     gen
 }
 
